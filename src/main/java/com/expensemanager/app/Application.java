@@ -1,8 +1,10 @@
 package com.expensemanager.app;
 
+import com.expensemanager.domain.Category;
 import com.expensemanager.domain.Expense;
 import com.expensemanager.repository.MemoryExpenseRepository;
 import com.expensemanager.service.ExpenseService;
+import com.expensemanager.service.dto.MonthlyReport;
 
 import java.util.List;
 import java.util.Scanner;
@@ -31,7 +33,7 @@ public class Application {
             switch (choice){
                 case 1 -> addExpenseMenu(scanner, expenseService);
                 case 2 -> displayAllExpenses(expenseService);
-                case 3 -> {}
+                case 3 -> displayMonthlyReport(scanner, expenseService);
                 case 4 -> {}
                 case 5 -> {
                     System.out.println("프로그램을 종료합니다.");
@@ -102,5 +104,47 @@ public class Application {
         System.out.println("총 지출: " + totalExpense + "원");
         System.out.println();
         System.out.println("엔터를 누르면 메뉴로 돌아갑니다...");
+    }
+
+    //3️⃣ 월별 보고서 보기
+    private static void displayMonthlyReport(Scanner scanner, ExpenseService expenseService){
+        System.out.println("보고서를 생성할 연도를 입력하세요 :");
+        System.out.print("> ");
+        int year = scanner.nextInt();
+
+        System.out.println();
+
+        System.out.println("월을 입력하세요 :");
+        System.out.print("> ");
+        int month = scanner.nextInt();
+        scanner.nextLine();
+
+        System.out.println();
+
+        MonthlyReport monthlyReports = expenseService.getMonthlyReport(year, month);
+
+        System.out.println("===== " + year + "년 " + month + "월 지출 보고서 =====");
+        System.out.println();
+
+        int totalAmount = monthlyReports.getTotalAmount();
+        System.out.println("총 지출 금액: " + totalAmount + "원");
+        System.out.println();
+
+        System.out.println("카테고리별 지출:");
+        for(Category c : Category.values()){
+            int amount = monthlyReports.getCategoryTotals().getOrDefault(c, 0);
+            System.out.printf("%-15s : %d원\n", c, amount);
+        }
+
+        System.out.println();
+
+        if(monthlyReports.getTopCategory() != null){
+            System.out.println("가장 많이 쓴 카테고리: " + monthlyReports.getTopCategory());
+        }else{
+            System.out.println("가장 많이 쓴 카테고리가 없습니다.");
+        }
+
+        System.out.println();
+        System.out.println("보고서 생성 완료!");
     }
 }

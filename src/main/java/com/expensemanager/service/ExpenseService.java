@@ -4,10 +4,13 @@ import com.expensemanager.domain.Category;
 import com.expensemanager.domain.Expense;
 import com.expensemanager.exception.InvalidInputException;
 import com.expensemanager.repository.ExpenseRepository;
+import com.expensemanager.service.dto.MonthlyReport;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ExpenseService {
 
@@ -75,5 +78,32 @@ public class ExpenseService {
         expenses.sort((e1, e2) -> Long.compare(e1.getId(), e2.getId()));
 
         return expenses;
+    }
+
+    //3️⃣ 월별 보고서 보기
+    public MonthlyReport getMonthlyReport(int year, int month){
+        List<Expense> expenses = repository.findByMonth(year, month);
+
+        if(expenses.isEmpty()){
+            return new MonthlyReport(0, Map.of(), null);
+        }
+
+        //총 지출 금액
+        int totalAmount = expenses.stream().mapToInt(Expense::getAmount).sum();
+
+        //카테고리별 지출
+        Map<Category, Integer> categoryTotals = expenses.stream()
+                .collect(Collectors.groupingBy(
+                        Expense::getCategory, //1차적으로 카테고리별로 묶은 후
+                        Collectors.summingInt(Expense::getAmount) //2차로 카테고리별 금액으로 묶기
+                ));
+
+        //가장 많이 쓴 카테고리
+        Category topCategory = categoryTotals.entrySet().stream()//categoryTotals에서 만들어진 키-값이 한쌍의 세트가 된다
+                .max(Map.Entry.comparingByValue())//값을 기준으로 제일 큰 값
+                .map(Map.Entry::getKey)//제일 큰 값의 키
+                .orElse(null);//데이터 비어있으면 null 반환
+
+        return new MonthlyReport(totalAmount, categoryTotals, topCategory);
     }
 }
