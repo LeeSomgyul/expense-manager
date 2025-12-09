@@ -1,8 +1,10 @@
 package com.expensemanager.app;
 
+import com.expensemanager.domain.Expense;
 import com.expensemanager.repository.MemoryExpenseRepository;
 import com.expensemanager.service.ExpenseService;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class Application {
@@ -28,7 +30,7 @@ public class Application {
 
             switch (choice){
                 case 1 -> addExpenseMenu(scanner, expenseService);
-                case 2 -> {}
+                case 2 -> displayAllExpenses(expenseService);
                 case 3 -> {}
                 case 4 -> {}
                 case 5 -> {
@@ -40,6 +42,7 @@ public class Application {
         }
     }
 
+    //1️⃣ 지출 추가하기
     private static void addExpenseMenu(Scanner scanner, ExpenseService expenseService){
         System.out.println("지출 날짜를 입력하세요 (예: 2025-01-14) :");
         System.out.print(">");
@@ -67,5 +70,37 @@ public class Application {
         expenseService.addExpense(dateInput, description, amountInput, categoryInput);
 
         System.out.println("지출이 추가되었습니다!");
+    }
+
+    //2️⃣ 지출 목록 보기
+    private static void displayAllExpenses(ExpenseService expenseService){
+        System.out.println("[지출 목록]");
+        System.out.println();
+
+        List<Expense> expenses = expenseService.getAllExpenses();
+
+        //저장된 지출 목록이 없다면
+        if(expenses.isEmpty()){
+            System.out.println("저장된 지출이 없습니다.");
+            return;
+        }
+
+        System.out.println("ID | 날짜        | 내용        | 금액   | 카테고리");
+        System.out.println("--------------------------------------------------------");
+
+        int totalExpense = 0;
+
+        for(Expense e : expenses){
+            System.out.printf("%-3d|%-13s|%-10s|%-8d|%s",
+                    e.getId(), e.getDate(), e.getDescription(), e.getAmount(), e.getCategory());
+
+            totalExpense += e.getAmount();
+        }
+
+        System.out.println();
+        System.out.println("--------------------------------------------------------");
+        System.out.println("총 지출: " + totalExpense + "원");
+        System.out.println();
+        System.out.println("엔터를 누르면 메뉴로 돌아갑니다...");
     }
 }
