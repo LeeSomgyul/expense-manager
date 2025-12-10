@@ -2,6 +2,7 @@ package com.expensemanager.app;
 
 import com.expensemanager.domain.Category;
 import com.expensemanager.domain.Expense;
+import com.expensemanager.exception.ExpenseNotFoundException;
 import com.expensemanager.repository.MemoryExpenseRepository;
 import com.expensemanager.service.ExpenseService;
 import com.expensemanager.service.dto.MonthlyReport;
@@ -34,7 +35,7 @@ public class Application {
                 case 1 -> addExpenseMenu(scanner, expenseService);
                 case 2 -> displayAllExpenses(expenseService);
                 case 3 -> displayMonthlyReport(scanner, expenseService);
-                case 4 -> {}
+                case 4 -> deleteExpenseMenu(scanner, expenseService);
                 case 5 -> {
                     System.out.println("프로그램을 종료합니다.");
                     return;
@@ -146,5 +147,23 @@ public class Application {
 
         System.out.println();
         System.out.println("보고서 생성 완료!");
+    }
+
+    //4️⃣ 삭제하기
+    private static void deleteExpenseMenu(Scanner scanner, ExpenseService expenseService){
+        System.out.println("삭제할 지출 ID를 입력하세요 :");
+        System.out.print("> ");
+
+        long id = scanner.nextLong();
+        scanner.nextLine();
+
+        System.out.println();
+
+        try{
+            expenseService.deleteExpense(id);
+            System.out.println("ID " + id + "번 지출이 삭제되었습니다.");
+        }catch (ExpenseNotFoundException error){
+            System.out.println(error.getMessage());
+        }
     }
 }

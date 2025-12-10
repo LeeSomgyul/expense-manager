@@ -2,6 +2,7 @@ package com.expensemanager.service;
 
 import com.expensemanager.domain.Category;
 import com.expensemanager.domain.Expense;
+import com.expensemanager.exception.ExpenseNotFoundException;
 import com.expensemanager.exception.InvalidInputException;
 import com.expensemanager.repository.ExpenseRepository;
 import com.expensemanager.service.dto.MonthlyReport;
@@ -10,6 +11,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ExpenseService {
@@ -105,5 +107,16 @@ public class ExpenseService {
                 .orElse(null);//데이터 비어있으면 null 반환
 
         return new MonthlyReport(totalAmount, categoryTotals, topCategory);
+    }
+
+    //4️⃣ 삭제 하기
+    public void deleteExpense(long id){
+        Optional<Expense> expenseOpt = repository.findById(id);
+
+        Expense expense = expenseOpt.orElseThrow(
+                () -> new ExpenseNotFoundException("ID " + id + "번 지출을 찾을 수 없습니다.")
+        );
+
+        repository.deleteById(expense.getId());
     }
 }
