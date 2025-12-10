@@ -5,6 +5,7 @@ import com.expensemanager.domain.Expense;
 import com.expensemanager.exception.ExpenseNotFoundException;
 import com.expensemanager.exception.InvalidInputException;
 import com.expensemanager.repository.ExpenseRepository;
+import com.expensemanager.repository.FileExpenseRepository;
 import com.expensemanager.service.dto.MonthlyReport;
 
 import java.time.LocalDate;
@@ -118,5 +119,12 @@ public class ExpenseService {
         );
 
         repository.deleteById(expense.getId());
+    }
+
+    //✅ 파일 저장하기
+    public void saveDate(){
+        if(repository instanceof FileExpenseRepository fileExpenseRepository){
+            fileExpenseRepository.saveToFile();
+        }
     }
 }

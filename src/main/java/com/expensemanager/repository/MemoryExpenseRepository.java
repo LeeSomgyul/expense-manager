@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+//⭐테스트 용 레포지토리
 public class MemoryExpenseRepository implements ExpenseRepository{
 
     /**Expense 객체를 여러 개 담을 수 있는 리스트(DB 대신 임시방편)**/

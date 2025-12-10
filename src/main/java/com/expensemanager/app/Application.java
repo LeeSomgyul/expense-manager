@@ -3,7 +3,7 @@ package com.expensemanager.app;
 import com.expensemanager.domain.Category;
 import com.expensemanager.domain.Expense;
 import com.expensemanager.exception.ExpenseNotFoundException;
-import com.expensemanager.repository.MemoryExpenseRepository;
+import com.expensemanager.repository.FileExpenseRepository;
 import com.expensemanager.service.ExpenseService;
 import com.expensemanager.service.dto.MonthlyReport;
 
@@ -14,8 +14,7 @@ public class Application {
     public static void main(String[] args){
         Scanner scanner = new Scanner(System.in);
 
-        //🔴 expenseService가  MemoryExpenseRepository만 사용하도록 의존성 주입
-        ExpenseService expenseService = new ExpenseService(new MemoryExpenseRepository());
+        ExpenseService expenseService = new ExpenseService(new FileExpenseRepository("expense.csv"));
 
         while(true){
             System.out.println("============================");
@@ -37,6 +36,8 @@ public class Application {
                 case 3 -> displayMonthlyReport(scanner, expenseService);
                 case 4 -> deleteExpenseMenu(scanner, expenseService);
                 case 5 -> {
+                    expenseService.saveDate();
+                    System.out.println("데이터 저장 완료!");
                     System.out.println("프로그램을 종료합니다.");
                     return;
                 }
